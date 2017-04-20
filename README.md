@@ -9,7 +9,7 @@
 
 ## Modifications
 
-_Original source is from [NGINX 1.11.3](https://raw.githubusercontent.com/nginx/nginx/release-1.11.13/src/http/modules/ngx_http_image_filter_module.c)_
+_Original source is from [NGINX 1.11.13](https://raw.githubusercontent.com/nginx/nginx/release-1.11.13/src/http/modules/ngx_http_image_filter_module.c)_
 
 ### Always process the source JPEG or PNG image
 
