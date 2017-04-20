@@ -335,9 +335,13 @@ ngx_http_image_body_filter(ngx_http_request_t *r, ngx_chain_t *in)
                                               NGX_HTTP_UNSUPPORTED_MEDIA_TYPE);
         }
 
-        /* override content type */
+        /* override content type */  /* JJ201704: set type for PNG to JPEG for 'always output JPEG' */
 
-        ct = &ngx_http_image_types[ctx->type - 1];
+        if (ctx->type == NGX_HTTP_IMAGE_PNG) {
+            ct = &ngx_http_image_types[NGX_HTTP_IMAGE_JPEG - 1];
+        } else {
+            ct = &ngx_http_image_types[ctx->type - 1];
+        }
         r->headers_out.content_type_len = ct->len;
         r->headers_out.content_type = *ct;
         r->headers_out.content_type_lowcase = NULL;
@@ -727,6 +731,9 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
                            "app data size: %uz", app);
         }
 
+        /* JJ201704: Always process JPEG, even if source image is within size limits */
+        ctx->force = 1;
+
         break;
 
     case NGX_HTTP_IMAGE_GIF:
@@ -748,6 +755,9 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
 
         width = p[18] * 256 + p[19];
         height = p[22] * 256 + p[23];
+
+        /* JJ201704: Always process PNG, even if source image is within size limits */
+        ctx->force = 1;
 
         break;
 
@@ -1176,6 +1186,8 @@ ngx_http_image_out(ngx_http_request_t *r, ngx_uint_t type, gdImagePtr img,
 
     switch (type) {
 
+    /* PNG directly fall through to JPEG for 'always output JPEG' */
+    case NGX_HTTP_IMAGE_PNG:
     case NGX_HTTP_IMAGE_JPEG:
         conf = ngx_http_get_module_loc_conf(r, ngx_http_image_filter_module);
 
@@ -1193,10 +1205,12 @@ ngx_http_image_out(ngx_http_request_t *r, ngx_uint_t type, gdImagePtr img,
         failed = "gdImageGifPtr() failed";
         break;
 
+/*  JJ201704: Disable PNG output
     case NGX_HTTP_IMAGE_PNG:
         out = gdImagePngPtr(img, size);
         failed = "gdImagePngPtr() failed";
         break;
+*/
 
     case NGX_HTTP_IMAGE_WEBP:
 #if (NGX_HAVE_GD_WEBP)
