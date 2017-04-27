@@ -1,0 +1,15 @@
+# logging
+log_format ngx_json '{"ts":"$time_iso8601","pid":$pid,"raddr":"$remote_addr",'
+    '"method":"$request_method","url":"$scheme://$host$request_uri","rlen":$request_length,'
+    '"phost":"$proxy_host","puri":"$uri","rplen":$bytes_sent,'
+    '"status":$status,"rtime":$request_time,'
+    '"xff": "$http_x_forwarded_for", "gzip_ratio": "$gzip_ratio" }';
+
+{{ if not (eq (default .Env.SG_ACCESS_LOG_STDOUT_DISABLE "false") "true") }}
+access_log /dev/stdout ngx_json;
+{{ end }}
+
+{{ if (eq (default .Env.SG_ACCESS_LOG_SYSLOG_ENABLE "false") "true") }}
+access_log {{ default .Env.SG_ACCESS_LOG_SYSLOG_CONF "syslog:server=logstack-client:24514,facility=local0,tag=nginx,severity=info" }} ngx_json;
+{{ end }}
+
