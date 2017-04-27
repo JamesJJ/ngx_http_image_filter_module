@@ -28,8 +28,11 @@ PNG was designed to be lossless and usually has larger file size. In my use case
 ## To-Do
 
   1. Currently changes above are hard coded. These should be changed to configuration settings.
-  2. Submit chnages back to NGINX!
+  2. Submit changes back to NGINX!
 
+## See also:
+
+  * [contrib directory](./contrib/README.md)
 
 ## License
 
